@@ -1208,6 +1208,30 @@ class Renderer2D extends p5.Renderer {
   //////////////////////////////////////////////
 
 
+  _wrapTextPretty(text, maxWidth) {
+  const ctx = this.drawingContext;
+  const words = text.trim().split(/\s+/);
+  let lines = [], currentLine = '', lineWidth = 0;
+
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i];
+    const testLine = currentLine ? currentLine + ' ' + word : word;
+    const testWidth = ctx.measureText(testLine).width;
+
+    if (testWidth > maxWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  }
+
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+
+  return lines;
+}
 
   _renderText(p, line, x, y, maxY, minY) {
     if (y < minY || y >= maxY) {
