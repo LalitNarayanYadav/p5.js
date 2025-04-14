@@ -1348,6 +1348,7 @@ Renderer2D.prototype.text = function (str, x, y, maxWidth, maxHeight) {
   // of BASELINE vertical alignment in a bounding box
 
   if (typeof maxWidth !== 'undefined') {
+    this._textWidth = maxWidth;
     if (this.drawingContext.textBaseline === constants.BASELINE) {
       baselineHacked = true;
       this.drawingContext.textBaseline = constants.TOP;
