@@ -631,6 +631,11 @@ export const RADIANS = 'radians';
 export const DEG_TO_RAD = _PI / 180.0;
 export const RAD_TO_DEG = 180.0 / _PI;
 
+// TEXT ALIGNMENT / WRAPPING
+export const JUSTIFIED = 'justified';
+export const PRETTY = 'pretty';
+export const BALANCE = 'balance';
+
 // SHAPE
 /**
  * @property {String} CORNER
