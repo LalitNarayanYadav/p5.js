@@ -1229,8 +1229,11 @@ class Renderer2D extends p5.Renderer {
         if (!this._fillSet) {
           this._setFill(constants._DEFAULT_TEXT_FILL);
         }
-
-        this.drawingContext.fillText(line, x, y);
+        if (this._textAlign === constants.JUSTIFIED) {
+          this._renderJustifiedText(line, x, y);
+        } else {
+          this.drawingContext.fillText(line, x, y);
+        }
       }
     } else {
       // an opentype font, let it handle the rendering
@@ -1241,6 +1244,28 @@ class Renderer2D extends p5.Renderer {
     p.pop();
     return p;
   }
+  _renderJustifiedText(line, x, y) {
+    const ctx = this.drawingContext;
+    const words = line.trim().split(/\s+/);
+     if (words.length <= 1) {
+       ctx.fillText(line, x, y);
+       return;
+     }
+    const spaceCount = words.length - 1;
+    const totalTextWidth = words.reduce((sum, word) => sum + ctx.measureText(word).width, 0);
+     const totalSpacing = this._textWidth - totalTextWidth;
+    const spaceWidth = totalSpacing / spaceCount;
+
+     let cursorX = x;
+     for (let i = 0; i < words.length; i++) {
+       const word = words[i];
+       ctx.fillText(word, cursorX, y);
+       if (i < words.length - 1) {
+         cursorX += ctx.measureText(word).width + spaceWidth;
+       }
+     }
+  }
+  
 
   textWidth(s) {
     if (this._isOpenType()) {
@@ -1272,7 +1297,8 @@ class Renderer2D extends p5.Renderer {
     this.drawingContext.font = `${this._textStyle || 'normal'} ${this._textSize ||
       12}px ${fontNameString}`;
 
-    this.drawingContext.textAlign = this._textAlign;
+   this.drawingContext.textAlign = this._textAlign === constants.JUSTIFIED ? constants.LEFT : this._textAlign;
+
     if (this._textBaseline === constants.CENTER) {
       this.drawingContext.textBaseline = constants._CTX_MIDDLE;
     } else {
