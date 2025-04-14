@@ -1367,19 +1367,30 @@ class Renderer2D extends p5.Renderer {
 Renderer2D.prototype.text = function (str, x, y, maxWidth, maxHeight) {
   let baselineHacked;
 
-  // baselineHacked: (HACK)
-  // A temporary fix to conform to Processing's implementation
-  // of BASELINE vertical alignment in a bounding box
-
   if (typeof maxWidth !== 'undefined') {
     this._textWidth = maxWidth;
+
     if (this.drawingContext.textBaseline === constants.BASELINE) {
       baselineHacked = true;
       this.drawingContext.textBaseline = constants.TOP;
     }
   }
 
-  const p = p5.Renderer.prototype.text.apply(this, arguments);
+  const p = this._pInst;
+  this._applyTextProperties();
+
+  const lineHeight = this._textLeading || this._textSize * 1.2;
+  const minY = 0;
+  const maxY = this.height;
+
+  let lines = [str];
+  if (this._textWrap === constants.PRETTY && maxWidth) {
+    lines = this._wrapTextPretty(str, maxWidth);
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    this._renderText(p, lines[i], x, y + i * lineHeight, maxY, minY);
+  }
 
   if (baselineHacked) {
     this.drawingContext.textBaseline = constants.BASELINE;
@@ -1387,6 +1398,7 @@ Renderer2D.prototype.text = function (str, x, y, maxWidth, maxHeight) {
 
   return p;
 };
+
 
 p5.Renderer2D = Renderer2D;
 
